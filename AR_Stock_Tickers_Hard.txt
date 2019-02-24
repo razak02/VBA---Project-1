@@ -1,0 +1,244 @@
+' The following coode analyzes the Stocks for three years and identifies each stocks ' yearly change as well as identifies the stock with the highest increase, decrease ' and the one with the highest voluem
+
+
+Sub Ticker_Vol()
+
+
+  ' Holding the worksheets
+
+  Dim ws_count As Integer
+  ws_count = ActiveWorkbook.Worksheets.Count
+
+
+       ' Declare initial variables
+
+        Dim Ticker As String
+        Dim LastRow As Double
+        Dim ClosePrice As Double
+        Dim OpenPrice As Double
+        Dim LastCol As Integer
+        Dim YearlyChange As Double
+        Dim Count As Integer
+        Dim PercentChange As Double
+
+        ' Addition variables for finding greatest percentage difference and volume
+
+        DIM Gr_Pr_Dec As Double
+        Dim Gr_Pr_Inc As Double
+        Dim Gr_Vol_Inc As Double 
+        Dim Gr_Inc_Ticker As String
+        Dim Gr_Dec_Ticker As String
+        Dim Gr_Vol_Ticker As String
+
+
+         'set an initial variable for holding the OpenPrice, ClosePrice and Yearly Change for each ticker
+   
+  'Start the Loop'
+  '------------------------------
+  
+  'Focus on the active worksheet at a time   
+
+    For Each ws In Worksheets
+      ws.Activate
+
+        LastRow = 0
+        LastCol = 0
+        LastRow = Cells(Rows.Count, "A").End(xlUp).Row
+        LastCol = Cells(2, Columns.Count).End(xlToLeft).Column
+             
+        'Cells(1, LastCol+2 ).Value = "Ticker"
+              
+        OpenPrice = 0
+        
+        ClosePrice = 0
+              
+        YearlyChange = 0
+              
+        Count = 1
+
+        Gr_Pr_Dec = 0 
+        Gr_Pr_Inc = 0 
+        Gr_Vol_Inc = 0 
+        Gr_Inc_Ticker = " "
+        Gr_Dec_Ticker = " "
+        Gr_Vol_Ticker = " "
+
+        
+        ' Set an initial variable for holding the total volume per Ticker and PriceDif
+
+        Dim Ticker_Total As Double
+        Ticker_Total = 0
+        
+
+        ' Ending assignment of values to meet Hard Assignment 
+
+        'Cells(1, LastCol+5).Value = "Close_Price"
+        'Cells(1, LastCol+4).Value = "Open_Price"
+
+        'Cells(1, LastCol+6).Value = "YearlyChange"
+        'Cells(1, LastCol+7).Value = "PercentChange"
+        'Cells(1, LastCol+3).Value = "Ticker Volume"
+
+        ' Moving to meeting Hard Assignment Foramt
+        '---------------------------------------------
+         Cells(1, LastCol+2 ).Value = "Ticker"
+         Cells(1, LastCol+3).Value = "YearlyChange"
+         Cells(1, LastCol+4).Value = "PercentChange"
+         Cells(1, LastCol+5).Value = "Ticker Volume"
+
+        
+        ' Keep track of the location for each Ticker in the summary table
+        
+        Dim Summary_Table_Row As Integer
+        Summary_Table_Row = 2
+
+        ' Loop through all Ticker
+        
+        For i = 2 To LastRow
+            
+            'Check if we are in the first row for the new ticker and capture the open price
+            
+            'OpenPrice = 0
+            
+            If Count = 1 Then
+            
+            Cells(i + 1, 1).Value = Cells(i, 1).Value
+            OpenPrice = Cells(i, 3).Value
+            Count = Count + 1
+            
+            End If
+            
+            ' Check if we are still within the same Ticker, if it is not...
+            If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+            ' Set the Ticker name and capture ClosePrice
+            Ticker_Name = Cells(i, 1).Value
+            ClosePrice = Cells(i, 6).Value
+	
+	' Note - use of 'Range' was preferred to Cells(x,y). Code for Range left if 	' needed in future
+
+            ' Add to the Ticker Total Volume
+            Ticker_Total = Ticker_Total + Cells(i, 7).Value
+
+            ' Print the Ticker Name in the Summary Table
+                Cells(Summary_Table_Row, LastCol + 2).Value = Ticker_Name
+
+            '  Range("I" & Summary_Table_Row).Value = Ticker_Name
+
+            ' Print the Ticker Total volume to the Summary Table
+
+            ' Range("J" & Summary_Table_Row).Value = Ticker_Total
+
+                Cells(Summary_Table_Row, LastCol + 5).Value = Ticker_Total
+                Cells(Summary_Table_Row, LastCol + 5).NumberFormat = "0,000"
+
+                'print the yearly change by looking at Close_Price - OpenPrice
+                
+                'Range("L" & Summary_Table_Row).Value = OpenPrice
+            
+            
+            ' Not publishing Open Price and Close Price for Hard Assignment
+            '-------------------------------------------------------------
+
+
+                'Cells(Summary_Table_Row, LastCol + 4).Value = OpenPrice
+                'Cells(Summary_Table_Row, LastCol + 5).Value = ClosePrice
+                'Cells(Summary_Table_Row, LastCol + 5).NumberFormat = "0.00"
+
+                'Range("K" & Summary_Table_Row).Value = ClosePrice
+
+
+                ' Publishing Yearly Change and Percent Change for Hard Assignment
+            '-------------------------------------------------------------
+
+                   ' If ClosePrice<>0 and OpenPrice<>0 Then
+                YearlyChange = ClosePrice - OpenPrice
+                Cells(Summary_Table_Row, LastCol + 3).Value = YearlyChange
+                Cells(Summary_Table_Row, LastCol + 3).NumberFormat = "0.000"
+
+                ' Foramt to display if there was loss or gain in YearlyChange
+               '-------------------------------------------------------------  
+                        If (Cells(Summary_Table_Row, LastCol + 3).value >0) Then
+                            Cells(Summary_Table_Row, LastCol + 3).Interior.ColorIndex = 4
+                        ElseIf (Cells(Summary_Table_Row, LastCol + 3).Value < 0) Then
+                            Cells(Summary_Table_Row, LastCol + 3).Interior.ColorIndex = 3
+                        End If
+
+
+            
+            If OpenPrice <> 0  Then
+                    PercentChange = (ClosePrice - OpenPrice) / OpenPrice
+            EndIf  
+
+                Cells(Summary_Table_Row, LastCol + 4).Value = PercentChange
+                Cells(Summary_Table_Row, LastCol + 4).NumberFormat = "0.00%"
+
+
+
+                ' Foramt to Obtain and display Greatest Increase, Greatest Decrease in Percent Change and corresponding Stock - Ticker Name
+               '-------------------------------------------------------------------------------------------------------
+                ' Greatest Percentage Increase
+
+                      
+
+
+
+
+                        If Gr_Pr_Inc < cells(Summary_Table_Row, LastCol+4).value Then                           
+                            Gr_Pr_Inc = cells(Summary_Table_Row, LastCol+4).value
+                            Gr_Inc_Ticker = Ticker_Name
+                        End If
+                    
+                        If Gr_Pr_Dec > cells(Summary_Table_Row, LastCol+4).value Then
+                             Gr_Pr_Dec = cells(Summary_Table_Row, LastCol+4).value
+                             Gr_Dec_Ticker = Ticker_Name
+                         End If
+
+                         If Gr_Vol_Inc < Ticker_Total Then
+                            Gr_Vol_Inc = Ticker_Total
+                            Gr_Vol_Ticker = Ticker_Name
+                         End If   
+
+
+                        Cells(1,LastCol+11).value = " Ticker"
+                        Cells(1,LastCol+12).value = " Value"
+
+                        cells(2, LastCol+10).value = "greatest % increase"
+                        cells(2, LastCol+11).value = Gr_Inc_Ticker
+                        cells(2, LastCol+12).value = Gr_Pr_Inc
+                        cells(2, LastCol+12).NumberFormat = "0.00%"  
+                        
+
+                        cells(3, LastCol+10).value = "greatest % decrease"
+                        cells(3, LastCol+11).value = Gr_Dec_Ticker
+                        cells(3, LastCol+12).value = Gr_Pr_Dec
+                        cells(3, LastCol+12).NumberFormat = "0.00%"
+                        
+
+                        cells(4, LastCol+10).value = "greatest Volume"
+                        cells(4, LastCol+11).value = Gr_Vol_Ticker
+                        cells(4, LastCol+12).value = Gr_Vol_Inc
+                        cells(4, LastCol+12).NumberFormat = "0,000"
+               
+
+               
+            ' Add one to the summary table row
+
+            Summary_Table_Row = Summary_Table_Row + 1
+            
+            ' Reset the  Total
+            Ticker_Total = 0
+            Count = 1
+
+            ' If the cell immediately following a row is the same stock...
+            Else
+            ' Add to the  Total
+            Ticker_Total = Ticker_Total + Cells(i, 7).Value
+
+            End If
+        Next i
+    ' Go to next worksheets
+  Next 
+End Sub
+
+
